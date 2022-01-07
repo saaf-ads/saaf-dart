@@ -1,0 +1,17 @@
+name: saaf
+description: Native relevant music ads
+version: 0.0.1
+homepage: https://github.com/backtrackapp/saaf-dart
+repository: https://github.com/backtrackapp/saaf-dart
+issue_tracker: https://github.com/backtrackapp/saaf-dart/issues
+documentation: https://github.com/backtrackapp/saaf-dart
+
+environment:
+  sdk: ">=2.3.0 <3.0.0"
+
+dependencies:
+  http: ^0.13.3
+  material:
+  url_launcher:
+  cached_network_image:
+  auto_size_text:
