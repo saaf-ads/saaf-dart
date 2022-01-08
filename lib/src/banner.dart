@@ -3,10 +3,17 @@ part of saaf;
 class BannerAd extends StatefulWidget {
   final BannerAdRequest request;
   final BannerAdStyle style;
+  final Function(BannerAdRequest request) onLoad;
+  final Function(BannerAdResponse response) onImpression;
+  final Function(BannerAdResponse response) onClick;
+
   BannerAd({
     Key key,
     @required this.request,
     this.style = const BannerAdStyle(),
+    this.onLoad,
+    this.onImpression,
+    this.onClick,
   }) : super(key: key);
 
   @override
@@ -23,7 +30,8 @@ class _BannerAdState extends State<BannerAd> {
   }
 
   Future<BannerAdResponse> load() async {
-    print(json.encode(widget.request.toJson()));
+    if (widget.onLoad is Function) widget.onLoad(widget.request);
+
     final response = await http.post(
       Uri.parse("https://saaf-api.backtrack.dev/banners/query"),
       body: json.encode(widget.request.toJson()),
@@ -39,6 +47,8 @@ class _BannerAdState extends State<BannerAd> {
   void impression() async {
     if (this.adResponse == null) return;
 
+    if (widget.onImpression is Function) widget.onImpression(this.adResponse);
+
     await http.post(
       Uri.parse(
           "https://saaf-api.backtrack.dev/impressions/${adResponse.requestId}"),
@@ -52,6 +62,8 @@ class _BannerAdState extends State<BannerAd> {
 
   void click() async {
     if (this.adResponse == null) return;
+
+    if (widget.onClick is Function) widget.onClick(this.adResponse);
 
     launch("https://saaf-api.backtrack.dev/clicks/${adResponse.requestId}",
         forceSafariVC: false, forceWebView: false);
