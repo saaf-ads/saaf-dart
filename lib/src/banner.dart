@@ -1,6 +1,6 @@
 part of saaf;
 
-class BannerAd extends StatefulWidget {
+class BannerAd extends StatelessWidget {
   final BannerAdRequest request;
   final BannerAdStyle style;
   final Function(BannerAdRequest request) onLoad;
@@ -20,25 +20,12 @@ class BannerAd extends StatefulWidget {
     @required this.errorWidget,
   }) : super(key: key);
 
-  @override
-  State<BannerAd> createState() => _BannerAdState();
-}
-
-class _BannerAdState extends State<BannerAd> {
-  BannerAdResponse adResponse;
-
-  @override
-  void initState() {
-    super.initState();
-    this.load();
-  }
-
   Future<BannerAdResponse> load() async {
-    if (widget.onLoad is Function) widget.onLoad(widget.request);
+    if (this.onLoad is Function) this.onLoad(this.request);
 
     final response = await http.post(
-      Uri.parse("${widget.baseUrl}/banners/query"),
-      body: json.encode(widget.request.toJson()),
+      Uri.parse("${this.baseUrl}/banners/query"),
+      body: json.encode(this.request.toJson()),
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode != 201) {
@@ -46,19 +33,20 @@ class _BannerAdState extends State<BannerAd> {
       print(response.body);
       throw new Exception('failed to load ad');
     }
-    this.adResponse = BannerAdResponse.fromJson(json.decode(response.body));
-    impression();
+    BannerAdResponse adResponse =
+        BannerAdResponse.fromJson(json.decode(response.body));
+    impression(adResponse);
 
-    return this.adResponse;
+    return adResponse;
   }
 
-  void impression() async {
-    if (this.adResponse == null) return;
+  void impression(adResponse) async {
+    if (adResponse == null) return;
 
-    if (widget.onImpression is Function) widget.onImpression(this.adResponse);
+    if (this.onImpression is Function) this.onImpression(adResponse);
 
     await http.post(
-      Uri.parse("${widget.baseUrl}/impressions/${adResponse.requestId}"),
+      Uri.parse("${this.baseUrl}/impressions/${adResponse.requestId}"),
       body: json.encode({
         "app": "statsfm",
         "platform": Platform.operatingSystem,
@@ -67,221 +55,234 @@ class _BannerAdState extends State<BannerAd> {
     );
   }
 
-  void click() async {
-    if (this.adResponse == null) return;
+  void click(adResponse) async {
+    if (adResponse == null) return;
 
-    if (widget.onClick is Function) widget.onClick(this.adResponse);
+    if (this.onClick is Function) this.onClick(adResponse);
 
-    launch("${widget.baseUrl}/clicks/${adResponse.requestId}",
+    launch("${this.baseUrl}/clicks/${adResponse.requestId}",
         forceSafariVC: false, forceWebView: false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<BannerAdResponse>(
-      future: load(),
-      builder: (context, snapshot) {
-        Widget child;
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minHeight: 70.0 + 7.0 + 7.0,
+      ),
+      child: FutureBuilder<BannerAdResponse>(
+        future: load(),
+        builder: (context, snapshot) {
+          Widget child;
 
-        if (snapshot.hasData &&
-            snapshot.connectionState == ConnectionState.done) {
-          if (adResponse.banner.id == 'd4264616-bd7d-4ec7-b0d6-12046af093a9' ||
-              adResponse.banner.id == '6ec2bc44-3b43-469d-84ec-c062e194f94b' &&
-                  widget.request.genres.indexOf('groovifi-large') > -1) {
-            child = buildGroovifiLarge(context);
-          } else if (adResponse.banner.id ==
-                  '5c778117-87bd-495f-93d9-7b60f917ea79' ||
-              adResponse.banner.id == 'f3323899-c40e-418f-a3f5-c998688e80f5') {
-            child = buildGroovifiSmall(context);
-          } else {
-            child = Material(
-              borderRadius: BorderRadius.circular(12.5),
-              color: widget.style.backgroundColor,
-              child: InkWell(
+          if (snapshot.hasData &&
+              snapshot.connectionState == ConnectionState.done) {
+            BannerAdResponse adResponse = snapshot.data;
+
+            if ((adResponse.banner.id ==
+                    'd4264616-bd7d-4ec7-b0d6-12046af093a9' ||
+                adResponse.banner.id ==
+                    '6ec2bc44-3b43-469d-84ec-c062e194f94b' ||
+                adResponse.banner.id ==
+                    '5c778117-87bd-495f-93d9-7b60f917ea79' ||
+                adResponse.banner.id ==
+                    'f3323899-c40e-418f-a3f5-c998688e80f5')) {
+              if (this.request.genres.indexOf('groovifi-large') > -1) {
+                child = buildGroovifiLarge(context, adResponse);
+              } else {
+                child = buildGroovifiSmall(context, adResponse);
+              }
+            } else {
+              child = Material(
                 borderRadius: BorderRadius.circular(12.5),
-                onTap: click,
-                child: Padding(
-                  padding: EdgeInsets.all(7),
-                  child: Stack(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(7.5),
-                            child: CachedNetworkImage(
-                              imageUrl: adResponse.banner.image,
-                              fit: BoxFit.cover,
-                              height: 70,
-                              width: 70,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: AutoSizeText.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: adResponse.banner.title + "\n",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline1
-                                        .copyWith(
-                                          color: widget.style.titleColor,
-                                          height: 1.1,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                  ),
-                                  TextSpan(
-                                    text: adResponse.banner.subtitle,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyText1
-                                        .copyWith(
-                                          color: widget.style.textColor,
-                                          height: 1.1,
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 14,
-                                        ),
-                                  ),
-                                ],
+                color: this.style.backgroundColor,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12.5),
+                  onTap: () => click(adResponse),
+                  child: Padding(
+                    padding: EdgeInsets.all(7),
+                    child: Stack(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(7.5),
+                              child: CachedNetworkImage(
+                                imageUrl: adResponse.banner.image,
+                                fit: BoxFit.cover,
+                                height: 70,
+                                width: 70,
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                        ],
-                      ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: widget.style.backgroundColor,
-                            borderRadius: BorderRadius.circular(5),
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 5,
-                                color: widget.style.backgroundColor,
-                                offset: Offset(-5, 0),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Expanded(
+                              child: AutoSizeText.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: adResponse.banner.title + "\n",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .copyWith(
+                                            color: this.style.titleColor,
+                                            height: 1.1,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                    ),
+                                    TextSpan(
+                                      text: adResponse.banner.subtitle,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1
+                                          .copyWith(
+                                            color: this.style.textColor,
+                                            height: 1.1,
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 14,
+                                          ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                          ],
+                        ),
+                        Align(
+                          alignment: Alignment.bottomRight,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: widget.style.primaryColor.withOpacity(.1),
-                              borderRadius: BorderRadius.circular(3),
+                              color: this.style.backgroundColor,
+                              borderRadius: BorderRadius.circular(5),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 5,
+                                  color: this.style.backgroundColor,
+                                  offset: Offset(-5, 0),
+                                ),
+                              ],
                             ),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 4.5, vertical: 1.4),
-                            child: Text(
-                              "AD",
-                              style: TextStyle(
-                                fontSize: 9,
-                                color: widget.style.primaryColor,
-                                fontWeight: FontWeight.bold,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: this.style.primaryColor.withOpacity(.1),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 4.5, vertical: 1.4),
+                              child: Text(
+                                "AD",
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  color: this.style.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                ),
+              );
+            }
+          } else if (snapshot.hasError) {
+            child = this.errorWidget;
+            // Container(
+            //   padding: EdgeInsets.all(7),
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(12.5),
+            //     color: this.style.backgroundColor,
+            //   ),
+            //   child: Column(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     crossAxisAlignment: CrossAxisAlignment.center,
+            //     mainAxisSize: MainAxisSize.max,
+            //     children: [
+            //       Text(
+            //         "Get Spotistats Plus to remove ads",
+            //         style: TextStyle(
+            //           color: this.style.textColor.withOpacity(.75),
+            //           height: 1.1,
+            //           fontWeight: FontWeight.bold,
+            //           fontSize: 16,
+            //         ),
+            //       ),
+            //       SizedBox(height: 10),
+            //       Text(
+            //         "No suitable ad found :‎(",
+            //         style: TextStyle(
+            //           color: this.style.textColor.withOpacity(.5),
+            //           height: 1.1,
+            //           fontWeight: FontWeight.w500,
+            //           fontSize: 14,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // );
+          } else {
+            child = Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.5),
+                color: this.style.backgroundColor,
+              ),
+              width: double.infinity,
+              height: 70.0 + 7.0 + 7.0,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12.5),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Text(
+                        "Searching for a relevant ad...",
+                        style: TextStyle(
+                          color: this.style.textColor.withOpacity(.5),
+                          height: 1.1,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: LinearProgressIndicator(
+                        backgroundColor:
+                            this.style.primaryColor.withOpacity(.2),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          this.style.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
           }
-        } else if (snapshot.hasError) {
-          child = widget.errorWidget;
-          // Container(
-          //   padding: EdgeInsets.all(7),
-          //   decoration: BoxDecoration(
-          //     borderRadius: BorderRadius.circular(12.5),
-          //     color: widget.style.backgroundColor,
-          //   ),
-          //   child: Column(
-          //     mainAxisAlignment: MainAxisAlignment.center,
-          //     crossAxisAlignment: CrossAxisAlignment.center,
-          //     mainAxisSize: MainAxisSize.max,
-          //     children: [
-          //       Text(
-          //         "Get Spotistats Plus to remove ads",
-          //         style: TextStyle(
-          //           color: widget.style.textColor.withOpacity(.75),
-          //           height: 1.1,
-          //           fontWeight: FontWeight.bold,
-          //           fontSize: 16,
-          //         ),
-          //       ),
-          //       SizedBox(height: 10),
-          //       Text(
-          //         "No suitable ad found :‎(",
-          //         style: TextStyle(
-          //           color: widget.style.textColor.withOpacity(.5),
-          //           height: 1.1,
-          //           fontWeight: FontWeight.w500,
-          //           fontSize: 14,
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // );
-        } else {
-          child = Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.5),
-              color: widget.style.backgroundColor,
-            ),
-            width: double.infinity,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12.5),
-              child: Stack(
-                children: [
-                  Center(
-                    child: Text(
-                      "Searching for a relevant ad...",
-                      style: TextStyle(
-                        color: widget.style.textColor.withOpacity(.5),
-                        height: 1.1,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: LinearProgressIndicator(
-                      backgroundColor:
-                          widget.style.primaryColor.withOpacity(.2),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        widget.style.primaryColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
 
-        return AnimatedSwitcher(
-          duration: Duration(milliseconds: 250),
-          child: child,
-        );
-      },
+          return AnimatedSwitcher(
+            duration: Duration(milliseconds: 250),
+            child: child,
+          );
+        },
+      ),
     );
   }
 
-  Widget buildGroovifiSmall(BuildContext context) {
+  Widget buildGroovifiSmall(BuildContext context, BannerAdResponse adResponse) {
     return GestureDetector(
-      onTap: click,
+      onTap: () => click(adResponse),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: widget.style.backgroundColor,
+          color: this.style.backgroundColor,
           borderRadius: BorderRadius.all(
             Radius.circular(10),
           ),
@@ -299,7 +300,7 @@ class _BannerAdState extends State<BannerAd> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      color: widget.style.titleColor,
+                      color: this.style.titleColor,
                     ),
                   ),
                 ),
@@ -322,7 +323,7 @@ class _BannerAdState extends State<BannerAd> {
                     maxLines: 2,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: widget.style.textColor,
+                      color: this.style.textColor,
                       fontSize: 17,
                     ),
                   ),
@@ -347,13 +348,13 @@ class _BannerAdState extends State<BannerAd> {
     );
   }
 
-  Widget buildGroovifiLarge(BuildContext context) {
+  Widget buildGroovifiLarge(BuildContext context, BannerAdResponse adResponse) {
     return GestureDetector(
-      onTap: click,
+      onTap: () => click(adResponse),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: widget.style.backgroundColor,
+          color: this.style.backgroundColor,
           borderRadius: BorderRadius.all(
             Radius.circular(10),
           ),
@@ -371,7 +372,7 @@ class _BannerAdState extends State<BannerAd> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 19,
-                      color: widget.style.titleColor,
+                      color: this.style.titleColor,
                     ),
                   ),
                 ),
@@ -388,7 +389,7 @@ class _BannerAdState extends State<BannerAd> {
               maxLines: 2,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: widget.style.textColor,
+                color: this.style.textColor,
                 fontSize: 15,
               ),
             ),
@@ -423,19 +424,19 @@ class _BannerAdState extends State<BannerAd> {
                     alignment: Alignment.bottomRight,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: widget.style.backgroundColor,
+                        color: this.style.backgroundColor,
                         borderRadius: BorderRadius.circular(5),
                         boxShadow: [
                           BoxShadow(
                             blurRadius: 5,
-                            color: widget.style.backgroundColor,
+                            color: this.style.backgroundColor,
                             offset: Offset(-5, 0),
                           ),
                         ],
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: widget.style.primaryColor.withOpacity(.1),
+                          color: this.style.primaryColor.withOpacity(.1),
                           borderRadius: BorderRadius.circular(3),
                         ),
                         padding: EdgeInsets.symmetric(
@@ -444,7 +445,7 @@ class _BannerAdState extends State<BannerAd> {
                           "AD",
                           style: TextStyle(
                             fontSize: 9,
-                            color: widget.style.primaryColor,
+                            color: this.style.primaryColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
