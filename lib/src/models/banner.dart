@@ -20,6 +20,7 @@ class BannerAd {
 class BannerAdStyle {
   final Color backgroundColor;
   final Color primaryColor;
+  final Color titleColor;
   final Color textColor;
   final int titleMaxLines;
   final int subtitleMaxLines;
@@ -27,7 +28,8 @@ class BannerAdStyle {
   const BannerAdStyle({
     this.backgroundColor = const Color.fromRGBO(255, 255, 255, 1),
     this.primaryColor = const Color.fromRGBO(79, 70, 229, 1),
-    this.textColor = const Color.fromRGBO(0, 0, 0, 1),
+    this.titleColor = const Color.fromRGBO(0, 0, 0, 1),
+    this.textColor = const Color.fromARGB(255, 32, 32, 32),
     this.titleMaxLines = 2,
     this.subtitleMaxLines = 2,
   });
@@ -39,6 +41,7 @@ class BannerAdRequest {
   List<String> languages;
   bool explicit;
   List<String> exclude;
+  String platform;
 
   BannerAdRequest({
     this.genres = const [],
@@ -46,6 +49,7 @@ class BannerAdRequest {
     this.languages = const [],
     this.explicit = false,
     this.exclude = const [],
+    this.platform,
   });
 
   Map<String, dynamic> toJson() => {
@@ -54,6 +58,7 @@ class BannerAdRequest {
         'languages': this.languages,
         'explicit': this.explicit,
         'exclude': this.exclude,
+        'platform': this.platform,
       };
 }
 
