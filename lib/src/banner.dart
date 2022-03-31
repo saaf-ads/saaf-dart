@@ -92,6 +92,10 @@ class BannerAd extends StatelessWidget {
               } else {
                 child = buildGroovifiSmall(context, adResponse);
               }
+            } else if (adResponse.banner.title == "" &&
+                adResponse.banner.subtitle == "" &&
+                adResponse.banner.image != "") {
+              return buildImage(context, adResponse);
             } else {
               child = Material(
                 borderRadius: BorderRadius.circular(12.5),
@@ -272,6 +276,61 @@ class BannerAd extends StatelessWidget {
             child: child,
           );
         },
+      ),
+    );
+  }
+
+  Widget buildImage(BuildContext context, BannerAdResponse adResponse) {
+    return GestureDetector(
+      onTap: () => click(adResponse),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: this.style.backgroundColor,
+          borderRadius: BorderRadius.all(
+            Radius.circular(10),
+          ),
+        ),
+        padding: EdgeInsets.only(left: 13, right: 13, top: 10, bottom: 8),
+        child: Stack(
+          children: [
+            CachedNetworkImage(
+              imageUrl: adResponse.banner.image,
+              height: 35,
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: this.style.backgroundColor,
+                  borderRadius: BorderRadius.circular(5),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 5,
+                      color: this.style.backgroundColor,
+                      offset: Offset(-5, 0),
+                    ),
+                  ],
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: this.style.primaryColor.withOpacity(.1),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.4),
+                  child: Text(
+                    "AD",
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: this.style.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
