@@ -92,9 +92,7 @@ class BannerAd extends StatelessWidget {
               } else {
                 child = buildGroovifiSmall(context, adResponse);
               }
-            } else if (adResponse.banner.title == "" &&
-                adResponse.banner.subtitle == "" &&
-                adResponse.banner.image != "") {
+            } else if (adResponse.banner.imageOnly == true) {
               return buildImage(context, adResponse);
             } else {
               child = Material(
@@ -291,16 +289,22 @@ class BannerAd extends StatelessWidget {
             Radius.circular(10),
           ),
         ),
-        padding: EdgeInsets.only(left: 13, right: 13, top: 10, bottom: 8),
         child: Stack(
+          alignment: AlignmentDirectional.bottomEnd,
           children: [
-            CachedNetworkImage(
-              imageUrl: adResponse.banner.image,
-              height: 35,
+            ClipRRect(
+              borderRadius: BorderRadius.all(
+                Radius.circular(10),
+              ),
+              child: CachedNetworkImage(
+                imageUrl: adResponse.banner.image,
+                width: double.infinity,
+              ),
             ),
             Align(
               alignment: Alignment.bottomRight,
               child: Container(
+                margin: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 4),
                 decoration: BoxDecoration(
                   color: this.style.backgroundColor,
                   borderRadius: BorderRadius.circular(5),

@@ -6,6 +6,7 @@ class BannerAd {
   final String subtitle;
   final String description;
   final String image;
+  final bool imageOnly;
   final double score;
 
   BannerAd.fromJson(Map json)
@@ -14,6 +15,7 @@ class BannerAd {
         subtitle = json["subtitle"],
         description = json["description"],
         image = json["image"],
+        imageOnly = json["imageOnly"],
         score = json["score"];
 }
 
@@ -42,6 +44,7 @@ class BannerAdRequest {
   bool explicit;
   List<String> exclude;
   String platform;
+  String saafVersion;
 
   BannerAdRequest({
     this.genres = const [],
@@ -50,6 +53,7 @@ class BannerAdRequest {
     this.explicit = false,
     this.exclude = const [],
     this.platform,
+    this.saafVersion,
   });
 
   Map<String, dynamic> toJson() => {
@@ -59,6 +63,7 @@ class BannerAdRequest {
         'explicit': this.explicit,
         'exclude': this.exclude,
         'platform': this.platform,
+        'saafVersion': this.saafVersion,
       };
 }
 
