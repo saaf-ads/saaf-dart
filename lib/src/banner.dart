@@ -6,6 +6,7 @@ class BannerAd extends StatelessWidget {
   final Function(BannerAdRequest request) onLoad;
   final Function(BannerAdResponse response) onImpression;
   final Function(BannerAdResponse response) onClick;
+  final Function(BannerAdResponse response) onReport;
   final String baseUrl;
   final Widget errorWidget;
 
@@ -16,6 +17,7 @@ class BannerAd extends StatelessWidget {
     this.onLoad,
     this.onImpression,
     this.onClick,
+    this.onReport,
     this.baseUrl = "https://api.stats.fm/api/v1/saaf",
     @required this.errorWidget,
   }) : super(key: key);
@@ -60,8 +62,17 @@ class BannerAd extends StatelessWidget {
 
     if (this.onClick is Function) this.onClick(adResponse);
 
-    launch("${this.baseUrl}/clicks/${adResponse.requestId}",
-        forceSafariVC: false, forceWebView: false);
+    if ((adResponse.banner.isPlusAd ?? false) != true) {
+      launch(
+        "${this.baseUrl}/clicks/${adResponse.requestId}",
+        forceSafariVC: false,
+        forceWebView: false,
+      );
+    } else {
+      await http.get(
+        Uri.parse("${this.baseUrl}/clicks/${adResponse.requestId}"),
+      );
+    }
   }
 
   @override
@@ -78,158 +89,31 @@ class BannerAd extends StatelessWidget {
           if (snapshot.hasData &&
               snapshot.connectionState == ConnectionState.done) {
             BannerAdResponse adResponse = snapshot.data;
+            // adResponse = BannerAdResponse.fromJson(
+            //   {
+            //     "requestId": "000",
+            //     "banner": {
+            //       "id": "",
+            //       "title":
+            //           "Tate McRae's new single \"she's all i wanna be\" is out now!",
+            //       "subtitle": "Click here to listen and explore :‎)",
+            //       "description": "",
+            //       "image":
+            //           "https://i.scdn.co/image/ab67616d0000b273f7916a35ffdd6cb90bbbdf2f",
+            //       "imageOnly": false,
+            //       "isPlusAd": false,
+            //       "score": 1.0
+            //     }
+            //   },
+            // );
 
-            if ((adResponse.banner.id ==
-                    'd4264616-bd7d-4ec7-b0d6-12046af093a9' ||
-                adResponse.banner.id ==
-                    '6ec2bc44-3b43-469d-84ec-c062e194f94b' ||
-                adResponse.banner.id ==
-                    '5c778117-87bd-495f-93d9-7b60f917ea79' ||
-                adResponse.banner.id ==
-                    'f3323899-c40e-418f-a3f5-c998688e80f5')) {
-              if (this.request.genres.indexOf('groovifi-large') > -1) {
-                child = buildGroovifiLarge(context, adResponse);
-              } else {
-                child = buildGroovifiSmall(context, adResponse);
-              }
-            } else if (adResponse.banner.imageOnly == true) {
-              return buildImage(context, adResponse);
+            if (adResponse.banner.imageOnly) {
+              child = buildImageAd(context, adResponse);
             } else {
-              child = Material(
-                borderRadius: BorderRadius.circular(12.5),
-                color: this.style.backgroundColor,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(12.5),
-                  onTap: () => click(adResponse),
-                  child: Padding(
-                    padding: EdgeInsets.all(7),
-                    child: Stack(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(7.5),
-                              child: CachedNetworkImage(
-                                imageUrl: adResponse.banner.image,
-                                fit: BoxFit.cover,
-                                height: 70,
-                                width: 70,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: AutoSizeText.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: adResponse.banner.title + "\n",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline1
-                                          .copyWith(
-                                            color: this.style.titleColor,
-                                            height: 1.1,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                    ),
-                                    TextSpan(
-                                      text: adResponse.banner.subtitle,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText1
-                                          .copyWith(
-                                            color: this.style.textColor,
-                                            height: 1.1,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 14,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                          ],
-                        ),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: this.style.backgroundColor,
-                              borderRadius: BorderRadius.circular(5),
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 5,
-                                  color: this.style.backgroundColor,
-                                  offset: Offset(-5, 0),
-                                ),
-                              ],
-                            ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: this.style.primaryColor.withOpacity(.1),
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 4.5, vertical: 1.4),
-                              child: Text(
-                                "AD",
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  color: this.style.primaryColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              child = buildAd(context, adResponse);
             }
           } else if (snapshot.hasError) {
             child = this.errorWidget;
-            // Container(
-            //   padding: EdgeInsets.all(7),
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(12.5),
-            //     color: this.style.backgroundColor,
-            //   ),
-            //   child: Column(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     crossAxisAlignment: CrossAxisAlignment.center,
-            //     mainAxisSize: MainAxisSize.max,
-            //     children: [
-            //       Text(
-            //         "Get Spotistats Plus to remove ads",
-            //         style: TextStyle(
-            //           color: this.style.textColor.withOpacity(.75),
-            //           height: 1.1,
-            //           fontWeight: FontWeight.bold,
-            //           fontSize: 16,
-            //         ),
-            //       ),
-            //       SizedBox(height: 10),
-            //       Text(
-            //         "No suitable ad found :‎(",
-            //         style: TextStyle(
-            //           color: this.style.textColor.withOpacity(.5),
-            //           height: 1.1,
-            //           fontWeight: FontWeight.w500,
-            //           fontSize: 14,
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // );
           } else {
             child = Container(
               decoration: BoxDecoration(
@@ -278,7 +162,7 @@ class BannerAd extends StatelessWidget {
     );
   }
 
-  Widget buildImage(BuildContext context, BannerAdResponse adResponse) {
+  Widget buildImageAd(BuildContext context, BannerAdResponse adResponse) {
     return GestureDetector(
       onTap: () => click(adResponse),
       child: Container(
@@ -301,188 +185,112 @@ class BannerAd extends StatelessWidget {
                 width: double.infinity,
               ),
             ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                margin: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 4),
-                decoration: BoxDecoration(
-                  color: this.style.backgroundColor,
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 5,
+            if (adResponse.banner.isPlusAd != true)
+              GestureDetector(
+                onTap: () => this.onReport(adResponse),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Container(
+                    margin:
+                        EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 4),
+                    decoration: BoxDecoration(
                       color: this.style.backgroundColor,
-                      offset: Offset(-5, 0),
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 5,
+                          color: this.style.backgroundColor,
+                          offset: Offset(-5, 0),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: this.style.primaryColor.withOpacity(.1),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.4),
-                  child: Text(
-                    "AD",
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: this.style.primaryColor,
-                      fontWeight: FontWeight.bold,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: this.style.primaryColor.withOpacity(.1),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.4),
+                      child: Text(
+                        "AD",
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: this.style.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget buildGroovifiSmall(BuildContext context, BannerAdResponse adResponse) {
-    return GestureDetector(
-      onTap: () => click(adResponse),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: this.style.backgroundColor,
-          borderRadius: BorderRadius.all(
-            Radius.circular(10),
-          ),
-        ),
-        padding: EdgeInsets.only(left: 13, right: 13, top: 10, bottom: 8),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: AutoSizeText(
-                    "Fine-tune your playlists with",
-                    maxLines: 2,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: this.style.titleColor,
+  Widget buildAd(BuildContext context, BannerAdResponse adResponse) {
+    return Material(
+      borderRadius: BorderRadius.circular(12.5),
+      color: this.style.backgroundColor,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12.5),
+        onTap: () => click(adResponse),
+        child: Padding(
+          padding: EdgeInsets.all(7),
+          child: Stack(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(7.5),
+                    child: CachedNetworkImage(
+                      imageUrl: adResponse.banner.image,
+                      fit: BoxFit.cover,
+                      height: 70,
+                      width: 70,
                     ),
                   ),
-                ),
-                SizedBox(width: 10),
-                CachedNetworkImage(
-                  imageUrl:
-                      'https://cdn.stats.fm/file/saafimages/groovifi.webp',
-                  height: 35,
-                )
-              ],
-            ),
-            SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: AutoSizeText(
-                    "Turn an ordinary music search engine into a tailored journey that's like music to your ears.",
-                    maxLines: 2,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: this.style.textColor,
-                      fontSize: 17,
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: AutoSizeText.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: adResponse.banner.title + "\n",
+                            style:
+                                Theme.of(context).textTheme.headline1.copyWith(
+                                      color: this.style.titleColor,
+                                      height: 1.1,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                          ),
+                          TextSpan(
+                            text: adResponse.banner.subtitle,
+                            style:
+                                Theme.of(context).textTheme.bodyText1.copyWith(
+                                      color: this.style.textColor,
+                                      height: 1.1,
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 14,
+                                    ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 10),
-                CachedNetworkImage(
-                  imageUrl:
-                      'https://cdn.stats.fm/file/saafimages/apple_appstore_badge.webp',
-                  height: 30,
-                ),
-                SizedBox(width: 5),
-                CachedNetworkImage(
-                  imageUrl:
-                      'https://cdn.stats.fm/file/saafimages/google_play_badge.webp',
-                  height: 30,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildGroovifiLarge(BuildContext context, BannerAdResponse adResponse) {
-    return GestureDetector(
-      onTap: () => click(adResponse),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: this.style.backgroundColor,
-          borderRadius: BorderRadius.all(
-            Radius.circular(10),
-          ),
-        ),
-        padding: EdgeInsets.only(left: 13, right: 13, top: 10, bottom: 8),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: AutoSizeText(
-                    "Tune your Spotify with",
-                    maxLines: 2,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 19,
-                      color: this.style.titleColor,
-                    ),
+                  SizedBox(
+                    width: 5,
                   ),
-                ),
-                SizedBox(width: 10),
-                CachedNetworkImage(
-                  imageUrl:
-                      'https://cdn.stats.fm/file/saafimages/groovifi.webp',
-                  height: 35,
-                )
-              ],
-            ),
-            AutoSizeText(
-              "Turn an ordinary music search engine into a tailored journey that's like music to your ears.",
-              maxLines: 2,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: this.style.textColor,
-                fontSize: 15,
+                ],
               ),
-            ),
-            SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: CachedNetworkImage(
-                imageUrl:
-                    'https://cdn.stats.fm/file/saafimages/groovifi_screenshot.webp',
-                width: double.infinity,
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                CachedNetworkImage(
-                  imageUrl:
-                      'https://cdn.stats.fm/file/saafimages/apple_appstore_badge.webp',
-                  height: 30,
-                ),
-                SizedBox(width: 5),
-                CachedNetworkImage(
-                  imageUrl:
-                      'https://cdn.stats.fm/file/saafimages/google_play_badge.webp',
-                  height: 30,
-                ),
-                SizedBox(width: 15),
-                Expanded(
+              if (adResponse.banner.isPlusAd != true)
+                GestureDetector(
+                  onTap: () => this.onReport(adResponse),
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: Container(
@@ -516,9 +324,8 @@ class BannerAd extends StatelessWidget {
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

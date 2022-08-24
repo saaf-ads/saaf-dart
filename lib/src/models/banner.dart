@@ -7,6 +7,7 @@ class BannerAd {
   final String description;
   final String image;
   final bool imageOnly;
+  final bool isPlusAd;
   final double score;
 
   BannerAd.fromJson(Map json)
@@ -16,6 +17,7 @@ class BannerAd {
         description = json["description"],
         image = json["image"],
         imageOnly = json["imageOnly"],
+        isPlusAd = json["isPlusAd"],
         score = json["score"];
 }
 
@@ -44,7 +46,7 @@ class BannerAdRequest {
   bool explicit;
   List<String> exclude;
   String platform;
-  String saafVersion;
+  int saafVersion;
 
   BannerAdRequest({
     this.genres = const [],
