@@ -54,8 +54,8 @@ class BannerAdRequest {
     this.languages = const [],
     this.explicit = false,
     this.exclude = const [],
-    this.platform,
-    this.saafVersion,
+    required this.platform,
+    required this.saafVersion,
   });
 
   Map<String, dynamic> toJson() => {

@@ -3,27 +3,27 @@ part of saaf;
 class BannerAd extends StatelessWidget {
   final BannerAdRequest request;
   final BannerAdStyle style;
-  final Function(BannerAdRequest request) onLoad;
-  final Function(BannerAdResponse response) onImpression;
-  final Function(BannerAdResponse response) onClick;
+  final Function(BannerAdRequest request)? onLoad;
+  final Function(BannerAdResponse response)? onImpression;
+  final Function(BannerAdResponse response)? onClick;
   final Function(BannerAdResponse response) onReport;
   final String baseUrl;
   final Widget errorWidget;
 
   BannerAd({
-    Key key,
-    @required this.request,
+    Key? key,
+    required this.request,
     this.style = const BannerAdStyle(),
     this.onLoad,
     this.onImpression,
     this.onClick,
-    this.onReport,
+    required this.onReport,
     this.baseUrl = "https://api.stats.fm/api/v1/saaf",
-    @required this.errorWidget,
+    required this.errorWidget,
   }) : super(key: key);
 
   Future<BannerAdResponse> load() async {
-    if (this.onLoad is Function) this.onLoad(this.request);
+    if (this.onLoad != null) this.onLoad!(this.request);
 
     final response = await http.post(
       Uri.parse("${this.baseUrl}/banners/query"),
@@ -31,7 +31,7 @@ class BannerAd extends StatelessWidget {
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode != 201) {
-      print(response.request.url);
+      print(response.request?.url);
       print(response.body);
       throw new Exception('failed to load ad');
     }
@@ -45,7 +45,7 @@ class BannerAd extends StatelessWidget {
   void impression(adResponse) async {
     if (adResponse == null) return;
 
-    if (this.onImpression is Function) this.onImpression(adResponse);
+    if (this.onImpression != null) this.onImpression!(adResponse);
 
     await http.post(
       Uri.parse("${this.baseUrl}/impressions/${adResponse.requestId}"),
@@ -60,7 +60,7 @@ class BannerAd extends StatelessWidget {
   void click(adResponse) async {
     if (adResponse == null) return;
 
-    if (this.onClick is Function) this.onClick(adResponse);
+    if (this.onClick != null) this.onClick!(adResponse);
 
     if ((adResponse.banner.isPlusAd ?? false) != true) {
       launch(
@@ -84,11 +84,11 @@ class BannerAd extends StatelessWidget {
       child: FutureBuilder<BannerAdResponse>(
         future: load(),
         builder: (context, snapshot) {
-          Widget child;
+          Widget child = const SizedBox();
 
           if (snapshot.hasData &&
               snapshot.connectionState == ConnectionState.done) {
-            BannerAdResponse adResponse = snapshot.data;
+            BannerAdResponse? adResponse = snapshot.data;
             // adResponse = BannerAdResponse.fromJson(
             //   {
             //     "requestId": "000",
@@ -106,11 +106,16 @@ class BannerAd extends StatelessWidget {
             //     }
             //   },
             // );
+            if (adResponse == null) {
+              child = this.errorWidget;
+            }
 
-            if (adResponse.banner.imageOnly) {
-              child = buildImageAd(context, adResponse);
-            } else {
-              child = buildAd(context, adResponse);
+            if (adResponse != null) {
+              if (adResponse.banner.imageOnly) {
+                child = buildImageAd(context, adResponse);
+              } else {
+                child = buildAd(context, adResponse);
+              }
             }
           } else if (snapshot.hasError) {
             child = this.errorWidget;
@@ -262,7 +267,7 @@ class BannerAd extends StatelessWidget {
                           TextSpan(
                             text: adResponse.banner.title + "\n",
                             style:
-                                Theme.of(context).textTheme.headline1.copyWith(
+                                Theme.of(context).textTheme.headline1!.copyWith(
                                       color: this.style.titleColor,
                                       height: 1.1,
                                       fontWeight: FontWeight.bold,
@@ -272,7 +277,7 @@ class BannerAd extends StatelessWidget {
                           TextSpan(
                             text: adResponse.banner.subtitle,
                             style:
-                                Theme.of(context).textTheme.bodyText1.copyWith(
+                                Theme.of(context).textTheme.bodyText1!.copyWith(
                                       color: this.style.textColor,
                                       height: 1.1,
                                       fontWeight: FontWeight.normal,
