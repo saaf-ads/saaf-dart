@@ -19,3 +19,5 @@ doc/api/
 
 .DS_Store
 .vscode
+.flutter-plugins
+.flutter-plugins-dependencies

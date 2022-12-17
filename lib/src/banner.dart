@@ -63,10 +63,9 @@ class BannerAd extends StatelessWidget {
     if (this.onClick != null) this.onClick!(adResponse);
 
     if ((adResponse.banner.isPlusAd ?? false) != true) {
-      launch(
-        "${this.baseUrl}/clicks/${adResponse.requestId}",
-        forceSafariVC: false,
-        forceWebView: false,
+      launchUrl(
+        Uri.parse("${this.baseUrl}/clicks/${adResponse.requestId}"),
+        mode: LaunchMode.externalApplication,
       );
     } else {
       await http.get(
