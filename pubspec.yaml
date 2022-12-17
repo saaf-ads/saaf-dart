@@ -12,5 +12,5 @@ environment:
 dependencies:
   http: ^0.13.3
   url_launcher: 6.1.7
-  cached_network_image: 3.2.2
+  cached_network_image: 3.2.3
   auto_size_text: 3.0.0
