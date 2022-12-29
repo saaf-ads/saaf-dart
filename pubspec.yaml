@@ -1,17 +1,16 @@
 name: saaf
 description: Native relevant music ads
-version: 0.0.3
+version: 0.0.4
 homepage: https://github.com/statsfm/saaf-dart
 repository: https://github.com/statsfm/saaf-dart
 issue_tracker: https://github.com/statsfm/saaf-dart/issues
 documentation: https://github.com/statsfm/saaf-dart
 
 environment:
-  sdk: ">=2.3.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   http: ^0.13.3
-  material:
-  url_launcher:
-  cached_network_image:
-  auto_size_text:
+  url_launcher: 6.1.7
+  cached_network_image: 3.2.3
+  auto_size_text: 3.0.0
