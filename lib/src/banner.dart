@@ -24,6 +24,8 @@ class BannerAd extends StatelessWidget {
 
   Future<BannerAdResponse> load() async {
     if (this.onLoad != null) this.onLoad!(this.request);
+    
+    print('SAAF: Looking for ad...');
 
     final response = await http.post(
       Uri.parse("${this.baseUrl}/banners/query"),
@@ -38,6 +40,8 @@ class BannerAd extends StatelessWidget {
     BannerAdResponse adResponse =
         BannerAdResponse.fromJson(json.decode(response.body));
     impression(adResponse);
+
+    print('SAAF: Ad found (HTTP:${response.statusCode})');
 
     return adResponse;
   }

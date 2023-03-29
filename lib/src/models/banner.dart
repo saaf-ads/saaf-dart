@@ -59,13 +59,13 @@ class BannerAdRequest {
   });
 
   Map<String, dynamic> toJson() => {
-        'genres': this.genres,
-        'artists': this.artists,
-        'languages': this.languages,
-        'explicit': this.explicit,
-        'exclude': this.exclude,
-        'platform': this.platform,
-        'saafVersion': this.saafVersion,
+        'genres': genres,
+        'artists': artists,
+        'languages': languages,
+        'explicit': explicit,
+        'exclude': exclude,
+        'platform': platform,
+        'saafVersion': saafVersion,
       };
 }
 
