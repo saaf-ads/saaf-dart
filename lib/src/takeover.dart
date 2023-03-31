@@ -123,125 +123,125 @@ class TakeoverAdWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: this.style.backgroundColor,
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 35, vertical: 15),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: this.style.backgroundColor,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      this.adResponse.takeover.shout,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "StatsfmSans",
+                        fontSize: 19,
+                        color: this.style.titleColor,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 10),
-                      Text(
-                        this.adResponse.takeover.shout,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "StatsfmSans",
-                          fontSize: 19,
-                          color: this.style.titleColor,
-                        ),
-                      ),
-                      SizedBox(height: 30),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          this.adResponse.takeover.image,
-                          fit: BoxFit.cover,
-                          height: 220,
-                          width: 220,
-                          // width: double.infinity,
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      Text(
-                        this.adResponse.takeover.title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "StatsfmSans",
-                          fontSize: 18,
-                          color: this.style.titleColor,
-                        ),
-                      ),
-                      Text(
-                        this.adResponse.takeover.subtitle,
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: this.style.textColor,
-                          fontFamily: "StatsfmSans",
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      ElevatedButton(
-                        onPressed: () => onClick is Function
-                            ? onClick!(adResponse, context)
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: this.style.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 7.5),
-                          child: Text(
-                            this.adResponse.takeover.ctaText,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: "StatsfmSans",
-                              color: this.style.backgroundColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  SizedBox(height: 25),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      this.adResponse.takeover.image,
+                      fit: BoxFit.cover,
+                      height: 220,
+                      width: 220,
+                      // width: double.infinity,
+                    ),
                   ),
-                ),
-                GestureDetector(
-                  onTap: () => this.onReport(this.adResponse),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: this.style.backgroundColor,
-                        borderRadius: BorderRadius.circular(5),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 5,
-                            color: this.style.backgroundColor,
-                            offset: Offset(-5, 0),
-                          ),
-                        ],
+                  SizedBox(height: 15),
+                  Text(
+                    this.adResponse.takeover.title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "StatsfmSans",
+                      fontSize: 18,
+                      color: this.style.titleColor,
+                    ),
+                  ),
+                  Text(
+                    this.adResponse.takeover.subtitle,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: this.style.textColor,
+                      fontFamily: "StatsfmSans",
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 25),
+                  ElevatedButton(
+                    onPressed: () => onClick is Function
+                        ? onClick!(adResponse, context)
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: this.style.primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
                       ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 7.5),
+                      child: Text(
+                        this.adResponse.takeover.ctaText,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: "StatsfmSans",
+                          color: this.style.backgroundColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => this.onReport(this.adResponse),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: this.style.primaryColor.withOpacity(.1),
-                          borderRadius: BorderRadius.circular(3),
+                          color: this.style.backgroundColor,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 5,
+                              color: this.style.backgroundColor,
+                              offset: Offset(-5, 0),
+                            ),
+                          ],
                         ),
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 4.5, vertical: 1.4),
-                        child: Text(
-                          "AD",
-                          style: TextStyle(
-                            fontSize: 9,
-                            color: this.style.primaryColor,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "StatsfmSans",
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: this.style.primaryColor.withOpacity(.1),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 4.5, vertical: 1.4),
+                          child: Text(
+                            "AD",
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: this.style.primaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "StatsfmSans",
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            SizedBox(height: 15),
+            SizedBox(height: 10),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
