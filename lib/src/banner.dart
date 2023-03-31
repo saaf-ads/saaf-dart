@@ -1,9 +1,9 @@
 part of saaf;
 
 class BannerAd extends StatelessWidget {
-  final BannerAdRequest request;
+  final AdRequest request;
   final BannerAdStyle style;
-  final Function(BannerAdRequest request)? onLoad;
+  final Function(AdRequest request)? onLoad;
   final Function(BannerAdResponse response)? onImpression;
   final Function(BannerAdResponse response)? onClick;
   final Function(BannerAdResponse response) onReport;

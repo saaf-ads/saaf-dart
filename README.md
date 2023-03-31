@@ -15,7 +15,7 @@ Widget buildBannerAd() {
         width: double.infinity,
         padding: EdgeInsets.symmetric(horizontal: 15),
         child: BannerAd(
-            request: BannerAdRequest(
+            request: AdRequest(
               genres: ['hiphop'],
               artists: ['0gxyHStUsqpMadRV0Di1Qt', '2iEvnFsWxR0Syqu2JNopAd'],
               languages: ['NL', 'EN'],

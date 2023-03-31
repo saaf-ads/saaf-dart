@@ -14,3 +14,4 @@ import 'src/models/_models.dart';
 export 'src/models/_models.dart';
 
 part 'src/banner.dart';
+part 'src/takeover.dart';
