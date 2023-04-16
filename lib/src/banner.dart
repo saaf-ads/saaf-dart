@@ -269,7 +269,7 @@ class BannerAd extends StatelessWidget {
                                 Theme.of(context).textTheme.headline1!.copyWith(
                                       color: this.style.titleColor,
                                       height: 1.1,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 16,
                                     ),
                           ),
@@ -279,7 +279,7 @@ class BannerAd extends StatelessWidget {
                                 Theme.of(context).textTheme.bodyText1!.copyWith(
                                       color: this.style.textColor,
                                       height: 1.1,
-                                      fontWeight: FontWeight.normal,
+                                      fontWeight: FontWeight.w500,
                                       fontSize: 14,
                                     ),
                           ),
