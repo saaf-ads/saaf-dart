@@ -3,6 +3,7 @@ part of saaf.models;
 class AdRequest {
   List<String> genres;
   List<String> artists;
+  List<int> artistIds;
   List<String> languages;
   bool explicit;
   List<String> exclude;
@@ -12,6 +13,7 @@ class AdRequest {
   AdRequest({
     this.genres = const [],
     this.artists = const [],
+    this.artistIds = const [],
     this.languages = const [],
     this.explicit = false,
     this.exclude = const [],
@@ -22,6 +24,7 @@ class AdRequest {
   Map<String, dynamic> toJson() => {
         'genres': this.genres,
         'artists': this.artists,
+        'artistIds': this.artistIds,
         'languages': this.languages,
         'explicit': this.explicit,
         'exclude': this.exclude,
