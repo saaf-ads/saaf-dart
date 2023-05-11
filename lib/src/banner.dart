@@ -265,23 +265,25 @@ class BannerAd extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: adResponse.banner.title + "\n",
-                            style:
-                                Theme.of(context).textTheme.headline1!.copyWith(
-                                      color: this.style.titleColor,
-                                      height: 1.1,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .displayLarge!
+                                .copyWith(
+                                  color: this.style.titleColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
                           ),
                           TextSpan(
                             text: adResponse.banner.subtitle,
-                            style:
-                                Theme.of(context).textTheme.bodyText1!.copyWith(
-                                      color: this.style.textColor,
-                                      height: 1.1,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
-                                    ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineMedium!
+                                .copyWith(
+                                  color: this.style.textColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                ),
                           ),
                         ],
                       ),
