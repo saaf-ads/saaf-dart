@@ -31,8 +31,7 @@ class BannerAd extends StatelessWidget {
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode != 201) {
-      print(response.request?.url);
-      print(response.body);
+      print('SAAF [${response.statusCode}]: ${response.request?.url} Body: ${response.body}');
       throw new Exception('failed to load ad');
     }
     BannerAdResponse adResponse =
