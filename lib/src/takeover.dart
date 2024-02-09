@@ -28,15 +28,13 @@ class TakeoverAd {
 
   Future<TakeoverAdResponse> load() async {
     if (this.onLoad != null) this.onLoad!(this.request);
-    print(json.encode(this.request.toJson()));
     final response = await http.post(
       Uri.parse("${this.baseUrl}/takeovers/query"),
       body: json.encode(this.request.toJson()),
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode != 201) {
-      print(response.request?.url);
-      print(response.body);
+      print('SAAF [${response.statusCode}]: ${response.request?.url} Body: ${response.body}');
       throw new Exception('failed to load ad');
     }
     this.adResponse = TakeoverAdResponse.fromJson(json.decode(response.body));
